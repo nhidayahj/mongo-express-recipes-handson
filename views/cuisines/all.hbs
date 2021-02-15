@@ -1,0 +1,12 @@
+{{#extends 'base'}}
+{{#block 'content'}}
+<ul>
+    {{#each type}}
+        <li>{{this.type}} ({{this._id}})</li>
+        <a href="/cuisines/{{this._id}}/update" class="btn btn-primary btn-sm">Update</a>
+        <a href="/cuisines/{{this._id}}/delete" class="btn btn-danger btn-sm">Delete</a>
+    {{/each}}
+</ul>
+
+{{/block}}
+{{/extends}}

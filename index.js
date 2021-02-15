@@ -27,82 +27,75 @@ app.use(
 );
 
 async function main() {
-  let db = await MongoUtil.connect(mongoUrl, "tgc11_recipes");
+  let db = await MongoUtil.connect(mongoUrl, "tgc11_recipes_handson");
 
   // MongoDB is connected and alive
 
-  // Show the form to create the ingredient
-  app.get("/ingredients/create", (req, res) => {
-    res.render("ingredients/create");
-  });
+  
+  
+  //create 
+  app.get('/cuisines/create', (req,res) => {
+      res.render('cuisines/create')
+  }) 
 
-  // Actually process the form to create the ingredient
-  app.post("/ingredients/create", async (req, res) => {
-    await db.collection("ingredients").insertOne({
-      name: req.body.ingredientName
-    });
-
-    res.redirect('/ingredients')
-  });
-
-  // Show all ingredients in the system
-  app.get("/ingredients", async (req, res) => {
-    // find all the ingredients
-    let ingredients = await db
-      .collection("ingredients") //select the ingredients collection
-      .find({}) // find all the ingredient with no criteria
-      .toArray(); // convert to array
-
-    res.render('ingredients/all', {
-        'everything': ingredients
-    })
-  });
-
-  // Delete ingredient from the system
-  app.get('/ingredients/:ingredient_id/delete', async (req,res)=>{
-    let id = req.params.ingredient_id;
-    let ingredient = await db.collection('ingredients').findOne({
-        '_id':ObjectId(id)
-    })
-    // test to ensure it's working
-    res.render('ingredients/delete',{
-        'ingredient':ingredient
-    })
+  app.post('/cuisines/create', async (req,res)=>{
+      await db.collection('cuisines').insertOne({
+          'type':req.body.cuisineType
+      })
+      res.send("Cuisine added")
   })
 
-  // process is what sent via the form
-  app.post('/ingredients/:ingredient_id/delete', async(req,res)=>{
-        await db.collection('ingredients').remove({
-            '_id':ObjectId(req.params.ingredient_id)
-        })
-        res.redirect('/ingredients')
-  })
-
-  // update
-  app.get('/ingredients/:ingredient_id/update', async (req,res)=>{
-      // we retrieve the ingredient information
-      let ingredient_id = req.params.ingredient_id;
-      let ingredient = await db.collection('ingredients').findOne({
-          '_id': ObjectId(ingredient_id)
-      });
-
-      res.render('ingredients/update', {
-          'ingredient': ingredient
+  //reading
+  app.get('/cuisines/all', async (req,res) => {
+      let cuisines = await db
+      .collection('cuisines')
+      .find()
+      .toArray()
+      //display all cuisines
+      res.render('cuisines/all', {
+          'type':cuisines
       })
   })
+  
+  //delete 
+  app.get('/cuisines/:cuisine_id/delete', async (req,res) => {
+      let cuisineId = req.params.cuisine_id;
+      let cuisine = await db.collection('cuisines').findOne({
+          '_id':ObjectId(cuisineId)
+      })
+      res.render('cuisines/delete', {
+        "cuisine": cuisine
+      })
+    //   res.send("trying to  Delete")
+  })
 
-  app.post('/ingredients/:ingredient_id/update',async (req,res)=>{
-      let newIngredientName = req.body.ingredientName;
-      let ingredientId = req.params.ingredient_id;
-      db.collection('ingredients').updateOne({
-          '_id': ObjectId(ingredientId)
+  app.post('/cuisines/:cuisine_id/delete', (req,res) => {
+      db.collection('cuisines').remove({
+          '_id': ObjectId(req.params.cuisine_id)
+      })
+      res.redirect('/cuisines/all')
+  })
+
+  app.get('/cuisines/:cuisine_id/update', async (req,res) => {
+    
+    let cuisines = await db.collection('cuisines').findOne({
+        '_id':ObjectId(req.params.cuisine_id)
+    })
+    res.render('cuisines/update', {
+        cuisinesType: cuisines
+    })
+  })
+
+  app.post('/cuisines/:cuisine_id/update', (req,res) => {
+      db.collection('cuisines').updateOne({
+          '_id':ObjectId(req.params.cuisine_id)
       }, {
           '$set': {
-            'name': newIngredientName
-          }           
-      });
-
-      res.redirect('/ingredients')
+            'type': req.body.cuisineType
+          }
+          
+      })
+      res.redirect('/cuisines/all')
   })
 
 }

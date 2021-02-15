@@ -1,0 +1,13 @@
+{{#extends 'base'}}
+{{#block 'content'}}
+<h1>Editing {{cuisinesType.type}}</h1>
+<form method="POST">
+    <div>
+        <label class="form-label">Cuisine Type</label>
+        <input type="text" name="cuisineType" class="form-control" value="{{cuisinesType.type}}"/>
+    </div>
+    <input type="submit" value="Update" class="btn btn-primary mt-3"/>
+
+</form>
+{{/block}}
+{{/extends}}
